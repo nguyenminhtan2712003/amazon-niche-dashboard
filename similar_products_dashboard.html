@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Similar Products Dashboard — Outdoor Apparel</title>
+<style>
+  :root{--bg:#fdf8f1;--card:#fff;--ink:#1f2937;--muted:#6b7280;--accent:#7a2e3b;--accent2:#1f3a2d;--gold:#c9a35e;--border:#e7dccc}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+  header{max-width:1400px;margin:0 auto;padding:36px 32px 16px}
+  h1{margin:0 0 6px;font-size:32px;font-weight:700;letter-spacing:-.5px}
+  header p{color:var(--muted);margin:0;font-size:14.5px;max-width:780px;line-height:1.55}
+  .stats{display:flex;gap:18px;margin-top:14px;font-size:12.5px;color:var(--muted)}
+  .stats b{color:var(--accent);font-size:14px}
+  .tabs{max-width:1400px;margin:24px auto 0;padding:0 32px;display:flex;gap:14px;flex-wrap:wrap}
+  .tab{padding:14px 28px;border-radius:8px;background:var(--accent2);color:#fff;cursor:pointer;font-weight:600;font-size:14px;border:none;transition:.2s;letter-spacing:.3px}
+  .tab.active{background:var(--accent)}
+  .tab:hover{filter:brightness(1.15)}
+  .tab .count{background:rgba(255,255,255,.18);padding:2px 8px;border-radius:6px;font-size:11.5px;margin-left:8px}
+  .tagline-row{max-width:1400px;margin:24px auto 0;padding:0 32px;display:grid;grid-template-columns:repeat(5,1fr);gap:24px;text-align:center}
+  .tagline{font-size:13px;color:var(--ink);font-weight:500;line-height:1.4;min-height:50px;display:flex;align-items:center;justify-content:center}
+  .grid-wrap{max-width:1400px;margin:24px auto 60px;padding:0 32px}
+  .section-title{font-size:20px;font-weight:700;margin:0 0 18px;color:var(--accent);display:flex;align-items:center;gap:12px}
+  .section-title .badge{background:var(--accent);color:#fff;padding:3px 12px;border-radius:6px;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase}
+  .section-meta{color:var(--muted);font-size:13px;margin:0 0 18px;line-height:1.6}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px}
+  .product{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .product:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(0,0,0,.08);border-color:var(--accent)}
+  .product .img{aspect-ratio:1/1.05;background:#f4ede0;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+  .product .img img{width:100%;height:100%;object-fit:contain;background:#f4ede0}
+  .product .rank{position:absolute;top:8px;left:8px;background:var(--accent);color:#fff;font-weight:700;font-size:11px;padding:3px 9px;border-radius:6px}
+  .product .body{padding:14px;display:flex;flex-direction:column;gap:6px;flex:1}
+  .product .brand{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:600}
+  .product .title{font-size:13px;font-weight:500;line-height:1.4;color:var(--ink);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .product .price{font-size:18px;font-weight:700;color:var(--accent);margin-top:4px}
+  .product .meta{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);margin-top:4px;padding-top:8px;border-top:1px solid var(--border)}
+  .product .stars{color:var(--gold);font-weight:600}
+  .product .clicks{font-weight:600;color:var(--accent2)}
+  .product a.buy{display:block;text-align:center;background:var(--accent2);color:#fff;text-decoration:none;padding:9px;font-size:12px;font-weight:600;letter-spacing:.5px;border-radius:0 0 12px 12px}
+  .product a.buy:hover{background:var(--accent)}
+  footer{text-align:center;color:var(--muted);padding:30px 20px;font-size:13px;border-top:1px solid var(--border);margin-top:40px}
+  .empty{padding:40px;text-align:center;color:var(--muted);background:#fff;border-radius:12px;border:1px dashed var(--border)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Similar Products Dashboard</h1>
+  <p>Tìm các ASIN tương tự 5 dòng outdoor apparel trong screenshot — Hardshell, Insulation, Midlayer, Base layer, Pants. Quét từ <b style="color:var(--accent)">9.67M ASIN</b> trên Amazon, lọc theo title + giá + clicks, rank theo lượt click.</p>
+  <div class="stats">
+    <span><b id="s-total">—</b> sản phẩm</span>
+    <span><b id="s-cats">5</b> dòng sản phẩm</span>
+    <span><b id="s-brands">—</b> thương hiệu</span>
+    <span><b id="s-clicks">—</b> tổng clicks</span>
+  </div>
+</header>
+
+<div class="tabs" id="tabs"></div>
+
+<div class="tagline-row" id="taglines">
+  <div class="tagline">Icon dòng: chống nước, chống gió, thoáng khí.<br>Lớp ngoài cùng.</div>
+  <div class="tagline">Lớp giữ nhiệt — puffer, down, padded.<br>Bảo vệ &amp; ấm.</div>
+  <div class="tagline">Lớp giữa — fleece, softshell.<br>Tính linh hoạt outdoor.</div>
+  <div class="tagline">Lớp sát da — thermal, merino, base layer.<br>Hút ẩm &amp; giữ ấm.</div>
+  <div class="tagline">Fit, vận động &amp; tính tiện dụng.<br>Hiking, ski, tactical.</div>
+</div>
+
+<div class="grid-wrap" id="content"></div>
+
+<footer>
+  Data từ <code>amazon_niche_asins.csv</code> · Filter: title keyword + price &gt; $15 + clicks &gt; 100 · Rank theo click_count_360
+</footer>
+
+<script>
+const D = {"hardshell": [{"asin": "B0CLR8QXKW", "title": "Columbia Mens Glennaker Lake II Rain Jacket Black/City Grey Large", "image": "https://m.media-amazon.com/images/I/31PfT8YqjCL.jpg", "brand": "Columbia", "price": 39.05, "rating": 4.5, "reviews": 3697, "clicks": 64936, "bsr": null, "category": "Clothing/Men/Rainwear"}, {"asin": "B0CLR98667", "title": "Columbia Mens Watertight II Waterproof Rain Jacket Black Large", "image": "https://m.media-amazon.com/images/I/41R18Pln6hL.jpg", "brand": "Columbia", "price": 57.86, "rating": 4.7, "reviews": 11072, "clicks": 59474, "bsr": 2, "category": "Men/Clothing/Jackets & Coats"}, {"asin": "B07Z7B47NB", "title": "TACVASEN Winter Jacket for Men Fleece Jacket Ski Coat Snowboarding Warm Jacket Winter Parka for Men Hooded Water Resistant Rain Co", "image": "https://m.media-amazon.com/images/I/41U76WGI5oL.jpg", "brand": "TACVASEN", "price": 53.29, "rating": 4.7, "reviews": 5667, "clicks": 56436, "bsr": 1, "category": "Sport Specific Clothing/Skiing/Men"}, {"asin": "B0C2HG4ZLZ", "title": "33 000ft Womens Rain Jacket Waterproof Lightweight Packable Raincoat with Hood for Golf Hiking Travel Windbreaker", "image": "https://m.media-amazon.com/images/I/41RxkyH7+AL.jpg", "brand": "33,000ft", "price": 35.77, "rating": 4.5, "reviews": 1481, "clicks": 50678, "bsr": 2, "category": "Women/Clothing/Coats, Jackets & Vests"}, {"asin": "B0CLRC4R4L", "title": "Columbia Womens Arcadia II Waterproof Rain Jacket Black Large", "image": "https://m.media-amazon.com/images/I/41kvKYm6kIL.jpg", "brand": "Columbia", "price": 55.97, "rating": 4.6, "reviews": 8133, "clicks": 46129, "bsr": 5, "category": "Women/Clothing/Coats, Jackets & Vests"}, {"asin": "B0CKPKZDXX", "title": "WASOTO Heated Jackets for Women 18400 mAh Battery Pack Water-Resistant Slim Fit with Detachable Hood Softshell Jackets(Black M)", "image": "https://m.media-amazon.com/images/I/4194UaBQmdL.jpg", "brand": "WASOTO", "price": 90.03, "rating": 4.4, "reviews": 587, "clicks": 37593, "bsr": 4, "category": "Sport Specific Clothing/Hiking & Outdoor Recreation/Women"}, {"asin": "B0CLRB4QLM", "title": "Columbia Mens Ascender Softshell Full Zip Rain Jacket Black Large", "image": "https://m.media-amazon.com/images/I/31X9gYQugqL.jpg", "brand": "Columbia", "price": 62.48, "rating": 4.7, "reviews": 1636, "clicks": 36391, "bsr": 2, "category": "Men/Clothing/Jackets & Coats"}, {"asin": "B0B5ZLFQC6", "title": "Outdoor Ventures Mens Rain Jacket Waterproof Lightweight Packable Rain Pullover for Hiking Golf Running", "image": "https://m.media-amazon.com/images/I/31qST8CI23L.jpg", "brand": "Outdoor Ventures", "price": 31.54, "rating": 4.5, "reviews": 1622, "clicks": 36147, "bsr": 10, "category": "Men/Clothing/Jackets & Coats"}, {"asin": "B094NH7BXN", "title": "33 000ft Packable Rain Jacket Mens Lightweight Waterproof Rain Shell Jacket Raincoat with Hood for Golf Cycling Windbreaker", "image": "https://m.media-amazon.com/images/I/412e5GdOMGL.jpg", "brand": "33,000ft", "price": 29.18, "rating": 4.5, "reviews": 5114, "clicks": 35874, "bsr": 10, "category": "Men/Clothing/Jackets & Coats"}], "insulation": [{"asin": "B0CLR9MNV8", "title": "Columbia Womens Heavenly Long Hooded Puffer Jacket Black Large", "image": "https://m.media-amazon.com/images/I/31TYHfvfLTL.jpg", "brand": "Columbia", "price": 116.96, "rating": 4.6, "reviews": 6589, "clicks": 38371, "bsr": 6, "category": "Women/Clothing/Coats, Jackets & Vests"}, {"asin": "B07PWYB6LZ", "title": "Amazon Essentials Boys Heavyweight Hooded Puffer Jacket Black Small", "image": "https://m.media-amazon.com/images/I/413SF8E0tWL.jpg", "brand": "Amazon Essentials", "price": 31.94, "rating": 4.7, "reviews": 9553, "clicks": 34723, "bsr": 1, "category": "Boys/Clothing/Jackets & Coats"}, {"asin": "B0B5JY6GJG", "title": "AUTOMET Fall Outfits Clothes Puffer Vest Women Sleeveless Winter Cropped Outerwear Warm Puffer Lightweight Stand-up Collar Down wi", "image": "https://m.media-amazon.com/images/I/41J8y+ozeYL.jpg", "brand": "AUTOMET", "price": 30.5, "rating": 4.5, "reviews": 2315, "clicks": 34406, "bsr": 24, "category": "Women/Clothing/Coats, Jackets & Vests"}, {"asin": "B0CMRJ1NKY", "title": "The North Face Womens Aconcagua 3 Jacket - Wind & Water Resistant Puffer Coat with Down & Synthetic Blend Insulation TNF Black-NPF", "image": "https://m.media-amazon.com/images/I/31OKqsrjg6L.jpg", "brand": "The North Face", "price": 195.71, "rating": 4.5, "reviews": 594, "clicks": 31948, "bsr": 60, "category": "Women/Clothing/Coats, Jackets & Vests"}, {"asin": "B0DHSKFK2K", "title": "SPACE LION Puffer Jacket Down Winter Coat Waterproof Windproof Lightweight Jacket Adjustable Fit Dog Coat for Small Medium Dogs(Bl", "image": "https://m.media-amazon.com/images/I/41BO4Mr9UBL.jpg", "brand": "SPACE LION", "price": 39.03, "rating": 4.5, "reviews": 486, "clicks": 25076, "bsr": 127, "category": "Dogs/Apparel & Accessories/Cold Weather Coats"}, {"asin": "B08SS8M9JT", "title": "Amazon Essentials Mens Packable Lightweight Water-Resistant Puffer Jacket (Available in Big & Tall) Dark Grey Large", "image": "https://m.media-amazon.com/images/I/41NYTbdRtnL.jpg", "brand": "Amazon Essentials", "price": 34.75, "rating": 4.5, "reviews": 32209, "clicks": 23636, "bsr": 1, "category": "Men/Clothing/Jackets & Coats"}, {"asin": "B0C8SPM8LJ", "title": "Songling Womens Oversized Puffer Vest Stand Collar Full Zip Sleeveless Bubble Puffer Vest Quilted Padded Warm Coat Outwear (Black ", "image": "https://m.media-amazon.com/images/I/41obBV5VzvL.jpg", "brand": "Songling", "price": 31.97, "rating": 4.5, "reviews": 1740, "clicks": 23494, "bsr": 132, "category": "Women/Clothing/Active"}, {"asin": "B0BNBG5LXD", "title": "THE NORTH FACE Womens Flare Down Insulated Puffer Jacket II (as1 alpha m regular regular Tnf Black)", "image": "https://m.media-amazon.com/images/I/319F1LaWm+L.jpg", "brand": "THE NORTH FACE", "price": 166.44, "rating": 4.4, "reviews": 296, "clicks": 23408, "bsr": 31, "category": "Women/Clothing/Coats, Jackets & Vests"}, {"asin": "B0BC5L988R", "title": "The NORTHFACE Mens Flare 2 Insulated 550-Down Full Zip Puffer Jacket (as1 alpha m regular regular Tnf Black Medium) NF0A55XG", "image": "https://m.media-amazon.com/images/I/41WdxdF5vHL.jpg", "brand": "The North Face", "price": 160.6, "rating": 4.6, "reviews": 723, "clicks": 20821, "bsr": 1, "category": "Men/Clothing/Jackets & Coats"}, {"asin": "B09GFM15Y9", "title": "Gihuo Womens Winter Cropped Puffer Jacket Coat Short Warm Quilted Jacket(Black-M)", "image": "https://m.media-amazon.com/images/I/41ZBlR45yJL.jpg", "brand": "Gihuo", "price": 46.39, "rating": 4.4, "reviews": 1509, "clicks": 19670, "bsr": 4, "category": "Women/Clothing/Coats, Jackets & Vests"}, {"asin": "B0CNC32HM7", "title": "The North Face Mens Aconcagua 3 Jacket (Standard & Big Size) - Wind & Water Resistant Puffer Coat Insulated TNF Black-NPF Large", "image": "https://m.media-amazon.com/images/I/31ffI+p791L.jpg", "brand": "The North Face", "price": 183.82, "rating": 4.4, "reviews": 590, "clicks": 18284, "bsr": 13, "category": "Men/Clothing/Jackets & Coats"}, {"asin": "B0CNCDYNRN", "title": "The North Face Mens Aconcagua 3 Jacket (Standard & Big Size) - Wind & Water Resistant Puffer Coat Insulated TNF Black-NPF X-Large", "image": "https://m.media-amazon.com/images/I/31ffI+p791L.jpg", "brand": "The North Face", "price": 183.42, "rating": 4.4, "reviews": 590, "clicks": 17888, "bsr": 13, "category": "Men/Clothing/Jackets & Coats"}], "midlayer": [{"asin": "B0076R6L58", "title": "Columbia Mens Steens Mountain 2.0 Full Zip Fleece Jacket Black Medium", "image": "https://m.media-amazon.com/images/I/41J5DyznplL.jpg", "brand": "Columbia", "price": 34.1, "rating": 4.7, "reviews": 53102, "clicks": 172976, "bsr": 1, "category": "Men/Clothing/Jackets & Coats"}, {"asin": "B0C7BHZCZG", "title": "EFAN Womens Oversized Comfort Fleece Hoodies Cozy Trendy Pullover Sweatshirts with Pockets For Fall & Winter Grey M", "image": "https://m.media-amazon.com/images/I/41Iswxg1wVL.jpg", "brand": "EFAN", "price": 23.9, "rating": 4.6, "reviews": 3832, "clicks": 94223, "bsr": 8, "category": "Women/Clothing/Fashion Hoodies & Sweatshirts"}, {"asin": "B003NX8CKG", "title": "Columbia Womens Benton Springs Full Zip Fleece Jacket Black Medium", "image": "https://m.media-amazon.com/images/I/41eKPYhAdIL.jpg", "brand": "Columbia", "price": 35.12, "rating": 4.6, "reviews": 54939, "clicks": 65829, "bsr": 6, "category": "Women/Clothing/Coats, Jackets & Vests"}, {"asin": "B08CY81R5Y", "title": "Nike Club Fleece Hoodie (Small) Black/White", "image": "https://m.media-amazon.com/images/I/41kg0in0yQL.jpg", "brand": "Nike", "price": 44.92, "rating": 4.7, "reviews": 3445, "clicks": 52797, "bsr": 42, "category": "Men/Clothing/Active"}, {"asin": "B08CY8F4K1", "title": "Nike Club Fleece Pullover Hoodie CJ1611", "image": "https://m.media-amazon.com/images/I/41kg0in0yQL.jpg", "brand": "Nike", "price": 46.38, "rating": 4.8, "reviews": 1127, "clicks": 50166, "bsr": 63, "category": "Men/Clothing/Active"}, {"asin": "B08QJ77MRR", "title": "ORORO [Upgraded] Womens Heated Fleece Vest with Heated Collar and Battery Lightweight Heating Vest Fleece (Black M)", "image": "https://m.media-amazon.com/images/I/319BcUftjEL.jpg", "brand": "ORORO", "price": 107.6, "rating": 4.3, "reviews": 2107, "clicks": 39217, "bsr": 16, "category": "Women/Clothing/Coats, Jackets & Vests"}, {"asin": "B0CMRNDRG4", "title": "The North Face Womens Osito Full Zip Fleece Jacket (Standard & Plus Size) - Soft & Lightweight Fleece Secure Zip Pockets TNF Black", "image": "https://m.media-amazon.com/images/I/31V8Km0KvwL.jpg", "brand": "The North Face", "price": 77.04, "rating": 4.7, "reviews": 663, "clicks": 35712, "bsr": 24, "category": "Women/Clothing/Coats, Jackets & Vests"}], "baselayer": [{"asin": "B088JYX7YN", "title": "WEERTI Thermal Underwear for Men Long Johns with Fleece Lined Base Layer Men Cold Weather Top Bottom-Black L", "image": "https://m.media-amazon.com/images/I/31ZDDg6KxBL.jpg", "brand": "WEERTI", "price": 27.87, "rating": 4.5, "reviews": 13704, "clicks": 315687, "bsr": 1, "category": "Men/Clothing/Underwear"}, {"asin": "B088H5DWV3", "title": "WEERTI Thermal Underwear for Women Long Johns with Fleece Lined Base Layer Women Cold Weather Top Bottom-Black M", "image": "https://m.media-amazon.com/images/I/31xrSmTL5WL.jpg", "brand": "WEERTI", "price": 26.87, "rating": 4.5, "reviews": 12843, "clicks": 142971, "bsr": 1, "category": "Women/Clothing/Lingerie, Sleep & Lounge"}, {"asin": "B0DJ55YCDJ", "title": "Kinglaman 5 Pack Womens Basic Long Sleeve Shirts Crew Neck Slim-Fit Fitted T Shirts Tops Undershirts Underscrub Baselayer 2 Black ", "image": "https://m.media-amazon.com/images/I/418Pe9trXRL.jpg", "brand": "Kinglaman", "price": 30.35, "rating": 4.7, "reviews": 1505, "clicks": 96354, "bsr": 266, "category": "Women/Clothing/Tops, Tees & Blouses"}, {"asin": "B08D2Q4NDZ", "title": "Fruit of The Loom Mens Recycled Waffle Thermal Underwear Bottom Black Medium", "image": "https://m.media-amazon.com/images/I/31r5g4W0K7L.jpg", "brand": "Fruit of the Loom", "price": 17.54, "rating": 4.6, "reviews": 24180, "clicks": 78234, "bsr": 2, "category": "Men/Clothing/Underwear"}, {"asin": "B0BV892XWX", "title": "Cuddl Duds Womens Heavyweight Fleece 2 Piece Long Sleeve Thermal Underwear Set Shirt & Leggings Base Layer for Cold Weather Winter", "image": "https://m.media-amazon.com/images/I/31I0c5NEcUL.jpg", "brand": "Cuddl Duds", "price": 34.57, "rating": 4.7, "reviews": 6179, "clicks": 62400, "bsr": 1, "category": "Women/Clothing/Lingerie, Sleep & Lounge"}, {"asin": "B07F1MHRKM", "title": "Mens Compression Shirt Slimming Body Shaper Vest Workout Tank Tops Abs Abdomen Undershirts(Black L)", "image": "https://m.media-amazon.com/images/I/41trXc96pHL.jpg", "brand": "Eleady", "price": 23.43, "rating": 4.2, "reviews": 24423, "clicks": 59079, "bsr": 1, "category": "Men/Clothing/Active"}, {"asin": "B0BV8QGYDY", "title": "Cuddl Duds Womens Heavyweight Fleece 2 Piece Long Sleeve Thermal Underwear Set Shirt & Leggings Base Layer for Cold Weather Winter", "image": "https://m.media-amazon.com/images/I/31I0c5NEcUL.jpg", "brand": "Cuddl Duds", "price": 34.12, "rating": 4.7, "reviews": 6179, "clicks": 53380, "bsr": 1, "category": "Women/Clothing/Lingerie, Sleep & Lounge"}, {"asin": "B09SPZPLL7", "title": "TELALEO 5 Pack Compression Shorts for Men Spandex Sport Shorts Athletic Workout Running Performance Baselayer Underwear Black L", "image": "https://m.media-amazon.com/images/I/31jEb8fZ9zL.jpg", "brand": "TELALEO", "price": 24.1, "rating": 4.6, "reviews": 10755, "clicks": 51742, "bsr": 2, "category": "Men/Clothing/Active"}, {"asin": "B08DP2QH3J", "title": "romision Thermal Underwear Long Johns for Men Fleece Lined Base Layer Cold Weather Hunting Gear Bottom and Top Set", "image": "https://m.media-amazon.com/images/I/31z4zpP1XUL.jpg", "brand": "romision", "price": 22.61, "rating": 4.6, "reviews": 8888, "clicks": 48843, "bsr": 4, "category": "Men/Clothing/Underwear"}, {"asin": "B0DT6JJ8SS", "title": "NebuKinex 5-Pack Womens Compression Shirts Short Sleeve Workout Tops Athletic Baselayer Quick Dry Gym Yoga Running T-Shirt Small", "image": "https://m.media-amazon.com/images/I/31P+qWoLKIL.jpg", "brand": "NebuKinex", "price": 27.37, "rating": 4.6, "reviews": 689, "clicks": 47701, "bsr": 469, "category": "Women/Clothing/Active"}, {"asin": "B0816ZY5BK", "title": "JZCreater Thermal Underwear for Men Mens Long Johns Thermal Underwear Set Fleece Lined Base Layer for Cold Weather Black", "image": "https://m.media-amazon.com/images/I/31jRwyzZ63L.jpg", "brand": "JZCreater", "price": 16.04, "rating": 4.6, "reviews": 2939, "clicks": 47320, "bsr": 3, "category": "Men/Clothing/Active"}, {"asin": "B0BF6TLF7B", "title": "Beverly Hills Polo Club Mens Beverly Hills Polo Polar Fleece W/Thermal Top Pajama Set Char Top With Blk/Wht Pants Medium US", "image": "https://m.media-amazon.com/images/I/41SNuM6YfcL.jpg", "brand": "Beverly Hills Polo Club", "price": 15.76, "rating": 4.7, "reviews": 3865, "clicks": 37500, "bsr": 1, "category": "Men/Clothing/Sleep & Lounge"}, {"asin": "B0DJ3PBQ1C", "title": "XINGCOOL Compression Shirt Men Slimming Body Shaper Vest Crewneck Workout Shirts Tummy Control Undershirts Black", "image": "https://m.media-amazon.com/images/I/412iOrH79sL.jpg", "brand": "XINGCOOL", "price": 19.66, "rating": 4.2, "reviews": 878, "clicks": 30853, "bsr": 3, "category": "Men/Clothing/Active"}, {"asin": "B0C81CPLJ4", "title": "TELALEO 4 Pack Womens Compression Shirt Long/Short Sleeve Performance Workout Baselayer Athletic Top Gym Sports Gear-2Black/2White", "image": "https://m.media-amazon.com/images/I/41sEpf-d2FL.jpg", "brand": "TELALEO", "price": 29.22, "rating": 4.5, "reviews": 530, "clicks": 30339, "bsr": 856, "category": "Women/Clothing/Active"}], "pants": [{"asin": "B0C8NRQP77", "title": "Comdecevis Mens Casual Cargo Pants Workout Joggers Stretch Sweatpants Hiking Drawstring Tactical Pants with Multi Pockets Black", "image": "https://m.media-amazon.com/images/I/31hvqNT32gL.jpg", "brand": "Comdecevis", "price": 19.27, "rating": 4.4, "reviews": 4714, "clicks": 124781, "bsr": 9, "category": "Men/Clothing/Active"}, {"asin": "B004D9BR06", "title": "Arctix Womens Insulated Snow Pants Black Small", "image": "https://m.media-amazon.com/images/I/31QKrG5m3xL.jpg", "brand": "Arctix", "price": 34.16, "rating": 4.3, "reviews": 62928, "clicks": 122414, "bsr": 1, "category": "Sport Specific Clothing/Skiing/Women"}, {"asin": "B00A219DL4", "title": "Match Mens Wild Cargo Pants(Black 32)", "image": "https://m.media-amazon.com/images/I/31pPpjOAp8L.jpg", "brand": "Match", "price": 37.43, "rating": 4.3, "reviews": 41250, "clicks": 84648, "bsr": 18, "category": "Men/Clothing/Pants"}, {"asin": "B08SM9JTP6", "title": "Amazon Essentials Mens Waterproof Breathable Insulated Snow Ski Pants Black Spruce Green Color Block X-Large", "image": "https://m.media-amazon.com/images/I/41GgTJOC5yL.jpg", "brand": "Amazon Essentials", "price": 35.1, "rating": 4.5, "reviews": 1486, "clicks": 81318, "bsr": 14, "category": "Sport Specific Clothing/Skiing/Men"}, {"asin": "B0CGHBGDM6", "title": "whox Mens Cargo Pants Casual Outdoor Hiking Pants for Men Athletic Joggers Sweatpants Brown", "image": "https://m.media-amazon.com/images/I/31MM9easmlL.jpg", "brand": "whox", "price": 18.1, "rating": 4.2, "reviews": 969, "clicks": 71856, "bsr": 33, "category": "Sport Specific Clothing/Hiking & Outdoor Recreation/Men"}, {"asin": "B0D56DKYJ5", "title": "AUTOMET Womens Wide Leg Sweatpants Baggy Lounge Travel Cargo Pants Fall Fashion Outfits 2026 Winter Clothes Joggers Gray M", "image": "https://m.media-amazon.com/images/I/31UehrDvw8L.jpg", "brand": "AUTOMET", "price": 19.48, "rating": 4.5, "reviews": 2261, "clicks": 71845, "bsr": 14, "category": "Women/Clothing/Active"}, {"asin": "B0BHZ15TT8", "title": "LYRXXX Mens Casual Cargo Pants Hiking Pants Workout Joggers Sweatpants for Men Light Khaki M", "image": "https://m.media-amazon.com/images/I/31S8aeIu-NL.jpg", "brand": "LYRXXX", "price": 22.39, "rating": 3.8, "reviews": 1442, "clicks": 69030, "bsr": 10, "category": "Sport Specific Clothing/Hiking & Outdoor Recreation/Men"}, {"asin": "B006C3YHKI", "title": "Arctix Mens Essential Snow Pants Black Medium", "image": "https://m.media-amazon.com/images/I/31ztXnDVpeL.jpg", "brand": "Arctix", "price": 42.13, "rating": 4.4, "reviews": 19693, "clicks": 68722, "bsr": 1, "category": "Sport Specific Clothing/Skiing/Men"}]};
+const META = [
+  {key:'hardshell', label:'Hardshell',  desc:'Lớp ngoài kỹ thuật — chống nước/gió, thoáng khí. Ski jacket, rain jacket, gore-tex.',  color:'#7a2e3b'},
+  {key:'insulation',label:'Insulation', desc:'Lớp giữ ấm — puffer jacket, down jacket, padded coat. Bảo vệ trong điều kiện lạnh.', color:'#3a5e7a'},
+  {key:'midlayer',  label:'Midlayer',   desc:'Lớp giữa — fleece jacket, softshell. Linh hoạt cho mọi hoạt động outdoor.',           color:'#1f3a2d'},
+  {key:'baselayer', label:'Base Layer', desc:'Lớp sát da — thermal underwear, merino wool. Hút ẩm và giữ ấm cơ thể.',                color:'#2a2a2a'},
+  {key:'pants',     label:'Pants',      desc:'Quần outdoor — hiking, ski, cargo, tactical. Vừa vặn, vận động linh hoạt.',             color:'#3d4a2a'}
+];
+
+const fmt = n => n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':String(n||0);
+
+function star(r){ if(!r) return ''; return '★'.repeat(Math.round(r))+'☆'.repeat(5-Math.round(r)); }
+
+function buildTabs(){
+  const t = document.getElementById('tabs');
+  META.forEach((m,i)=>{
+    const cnt = (D[m.key]||[]).length;
+    const b = document.createElement('button');
+    b.className = 'tab' + (i===0?' active':'');
+    b.dataset.k = m.key;
+    b.innerHTML = `${m.label}<span class="count">${cnt}</span>`;
+    b.onclick = () => {
+      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      render(m.key);
+    };
+    t.appendChild(b);
+  });
+}
+
+function render(key){
+  const items = D[key] || [];
+  const m = META.find(x=>x.key===key);
+  const wrap = document.getElementById('content');
+  if(items.length===0){
+    wrap.innerHTML = `<div class="empty">Không có sản phẩm phù hợp trong category này.</div>`;
+    return;
+  }
+  let html = `<h2 class="section-title"><span class="badge" style="background:${m.color}">${m.label}</span> Top ${items.length} sản phẩm tương tự</h2>`;
+  html += `<p class="section-meta">${m.desc}</p>`;
+  html += `<div class="grid">`;
+  items.forEach((p,i)=>{
+    const title = (p.title||'').replace(/"/g,'&quot;');
+    const price = p.price ? '$'+p.price : '—';
+    const rev = p.reviews ? fmt(p.reviews) : '0';
+    const rating = p.rating ? p.rating.toFixed(1) : '?';
+    const clicks = fmt(p.clicks);
+    html += `<div class="product">
+      <div class="img">
+        <span class="rank">#${i+1}</span>
+        <img loading="lazy" src="${p.image}" alt="${title}" onerror="this.style.display='none'">
+      </div>
+      <div class="body">
+        <div class="brand">${p.brand || 'Unknown'}</div>
+        <div class="title">${title}</div>
+        <div class="price">${price}</div>
+        <div class="meta">
+          <span class="stars" title="${rating}/5">${star(p.rating)} <span style="color:#999">(${rev})</span></span>
+          <span class="clicks">${clicks} 👆</span>
+        </div>
+      </div>
+      <a class="buy" href="https://www.amazon.com/dp/${p.asin}" target="_blank" rel="noopener">XEM TRÊN AMAZON →</a>
+    </div>`;
+  });
+  html += `</div>`;
+  wrap.innerHTML = html;
+}
+
+// Stats
+let total=0, brands=new Set(), clicks=0;
+Object.values(D).forEach(arr=>{
+  total += arr.length;
+  arr.forEach(p=>{ if(p.brand) brands.add(p.brand); clicks += (p.clicks||0); });
+});
+document.getElementById('s-total').textContent = total;
+document.getElementById('s-brands').textContent = brands.size;
+document.getElementById('s-clicks').textContent = fmt(clicks);
+
+buildTabs();
+render('hardshell');
+</script>
+</body>
+</html>

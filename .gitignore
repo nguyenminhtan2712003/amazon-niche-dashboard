@@ -1,0 +1,42 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (do not commit secrets!)
+.env*.local
+.env
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# vercel
+.vercel
+
+# Large database & data files (cannot push to GitHub)
+*.duckdb
+*.db
+*.csv
+amazon_niches_full.xlsx
+jacket_niches.xlsx
+
+# Virtual env
+.venv-duckdb/
